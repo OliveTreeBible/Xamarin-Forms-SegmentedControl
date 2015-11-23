@@ -15,6 +15,8 @@ namespace SegmentedControl.iOS
         protected override void OnElementChanged(ElementChangedEventArgs<SegmentedControl> e)
         {
             base.OnElementChanged(e);
+            if (e.NewElement == null)
+                return;
 
             var segmentedControl = new UISegmentedControl();
 
