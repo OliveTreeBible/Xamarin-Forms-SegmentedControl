@@ -31,5 +31,21 @@ namespace SegmentedControl.iOS
 
             SetNativeControl(segmentedControl);
         }
+
+        protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
+            if (e.PropertyName == SegmentedControl.SelectedValueProperty.PropertyName)
+            {
+                for (var i = 0; i < this.Control.NumberOfSegments; i++)
+                {
+                    if (Control.TitleAt(i) == Element.SelectedValue)
+                    {
+                        Control.SelectedSegment = i;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

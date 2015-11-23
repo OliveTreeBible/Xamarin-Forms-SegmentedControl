@@ -13,19 +13,14 @@ namespace SegmentedControl
             Children = new List<SegmentedControlOption>();
         }
 
-        public event ValueChangedEventHandler ValueChanged;
-
         public delegate void ValueChangedEventHandler(object sender, EventArgs e);
 
-        private string selectedValue;
+        public static readonly BindableProperty SelectedValueProperty = BindableProperty.Create<SegmentedControl, string>(s => s.SelectedValue, default(string), defaultBindingMode:BindingMode.TwoWay);
 
-        public string SelectedValue {
-            get{ return selectedValue; }
-            set {
-                selectedValue = value;
-                if (ValueChanged != null)
-                    ValueChanged(this, EventArgs.Empty);
-            }
+        public string SelectedValue
+        {
+            get { return (string)GetValue(SelectedValueProperty); }
+            set { SetValue(SelectedValueProperty, value); }
         }
     }
 
