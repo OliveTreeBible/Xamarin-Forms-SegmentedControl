@@ -24,6 +24,7 @@ namespace SegmentedControl.iOS
             {
                 segmentedControl.InsertSegment(e.NewElement.Children[i].Text, i, false);
             }
+            segmentedControl.TintColor = e.NewElement.TintColor.ToUIColor();
 
             segmentedControl.ValueChanged += (sender, eventArgs) => {
                 e.NewElement.SelectedValue = segmentedControl.TitleAt(segmentedControl.SelectedSegment);
@@ -45,6 +46,10 @@ namespace SegmentedControl.iOS
                         break;
                     }
                 }
+            }
+            else if (e.PropertyName == SegmentedControl.TintColorProperty.PropertyName)
+            {
+                Control.TintColor = Element.TintColor.ToUIColor();
             }
         }
     }

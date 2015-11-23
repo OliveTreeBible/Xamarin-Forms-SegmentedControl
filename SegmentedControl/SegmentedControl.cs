@@ -22,6 +22,14 @@ namespace SegmentedControl
             get { return (string)GetValue(SelectedValueProperty); }
             set { SetValue(SelectedValueProperty, value); }
         }
+
+        public static readonly BindableProperty TintColorProperty = BindableProperty.Create<SegmentedControl, Color>(s => s.TintColor, default(Color));
+
+        public Color TintColor
+        {
+            get { return (Color)GetValue(TintColorProperty); }
+            set { SetValue(TintColorProperty, value); }
+        }
     }
 
     public class SegmentedControlOption:View
