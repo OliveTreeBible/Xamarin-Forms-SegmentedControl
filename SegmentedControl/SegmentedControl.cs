@@ -23,7 +23,7 @@ namespace SegmentedControl
             set { SetValue(SelectedValueProperty, value); }
         }
 
-        public static readonly BindableProperty TintColorProperty = BindableProperty.Create<SegmentedControl, Color>(s => s.TintColor, default(Color));
+        public static readonly BindableProperty TintColorProperty = BindableProperty.Create<SegmentedControl, Color>(s => s.TintColor, Color.Default);
 
         public Color TintColor
         {

@@ -24,7 +24,9 @@ namespace SegmentedControl.iOS
             {
                 segmentedControl.InsertSegment(e.NewElement.Children[i].Text, i, false);
             }
-            segmentedControl.TintColor = e.NewElement.TintColor.ToUIColor();
+
+            if (e.NewElement.TintColor != Color.Default)
+                segmentedControl.TintColor = e.NewElement.TintColor.ToUIColor();
 
             segmentedControl.ValueChanged += (sender, eventArgs) => {
                 e.NewElement.SelectedValue = segmentedControl.TitleAt(segmentedControl.SelectedSegment);
@@ -47,7 +49,7 @@ namespace SegmentedControl.iOS
                     }
                 }
             }
-            else if (e.PropertyName == SegmentedControl.TintColorProperty.PropertyName)
+            else if (e.PropertyName == SegmentedControl.TintColorProperty.PropertyName && Element.TintColor != Color.Default)
             {
                 Control.TintColor = Element.TintColor.ToUIColor();
             }
