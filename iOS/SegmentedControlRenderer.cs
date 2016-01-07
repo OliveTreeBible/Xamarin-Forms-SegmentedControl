@@ -2,6 +2,7 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 using UIKit;
+using CoreGraphics;
 
 [assembly:ExportRenderer(typeof(SegmentedControl.SegmentedControl), typeof(SegmentedControl.iOS.SegmentedControlRenderer))]
 namespace SegmentedControl.iOS
@@ -33,6 +34,14 @@ namespace SegmentedControl.iOS
 			};
 
             SetNativeControl(segmentedControl);
+        }
+
+        public override CGSize IntrinsicContentSize
+        {
+            get
+            {
+                return Control.IntrinsicContentSize;
+            }
         }
 
         protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
