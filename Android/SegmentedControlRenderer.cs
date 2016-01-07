@@ -1,103 +1,130 @@
-﻿using System;
+﻿using System.ComponentModel;
+using Android.Content;
+using Android.Graphics;
+using Android.Util;
+using Android.Views;
+using Android.Widget;
+using BiblePlus.Droid;
+using SegmentedControl.Android;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
-using Android.Widget;
-using Android.Content;
-using Android.Util;
-using Android.Graphics;
-using Android.Views;
-using Android.Graphics.Drawables;
 
-[assembly:ExportRenderer (typeof(SegmentedControl.SegmentedControl), typeof(SegmentedControl.Android.SegmentedControlRenderer))]
+[assembly: ExportRenderer(typeof (SegmentedControl.SegmentedControl), typeof (SegmentedControlRenderer))]
+
 namespace SegmentedControl.Android
 {
-	public class SegmentedControlRenderer : ViewRenderer<SegmentedControl, RadioGroup>
-	{
-		public SegmentedControlRenderer ()
-		{
-		}
+    public class SegmentedControlRenderer : ViewRenderer<SegmentedControl, RadioGroup>
+    {
+        protected override void OnElementChanged(ElementChangedEventArgs<SegmentedControl> e)
+        {
+            base.OnElementChanged(e);
 
-		protected override void OnElementChanged (ElementChangedEventArgs<SegmentedControl> e)
-		{
-			base.OnElementChanged (e);
+            var layoutInflater = (LayoutInflater) Context.GetSystemService(Context.LayoutInflaterService);
 
-			var layoutInflater = (LayoutInflater)Context.GetSystemService (Context.LayoutInflaterService);
+            var g = new RadioGroup(Context) {Orientation = Orientation.Horizontal};
+            g.CheckedChange += (sender, eventArgs) =>
+            {
+                var rg = (RadioGroup) sender;
+                if (rg.CheckedRadioButtonId == -1) return;
+                var id = rg.CheckedRadioButtonId;
+                var radioButton = rg.FindViewById(id);
+                var radioId = rg.IndexOfChild(radioButton);
+                var btn = (RadioButton) rg.GetChildAt(radioId);
+                var selection = btn.Text;
+                e.NewElement.SelectedValue = selection;
+            };
 
-			var g = new RadioGroup (Context);
-			g.Orientation = Orientation.Horizontal;
-			g.CheckedChange += (sender, eventArgs) => {
-				var rg = (RadioGroup)sender;
-				if (rg.CheckedRadioButtonId != -1) {
-					var id = rg.CheckedRadioButtonId;
-					var radioButton = rg.FindViewById (id);
-					var radioId = rg.IndexOfChild (radioButton);
-					var btn = (RadioButton)rg.GetChildAt (radioId);
-					var selection = (String)btn.Text;
-					e.NewElement.SelectedValue = selection;
-				}
-			};
+            for (var i = 0; i < e.NewElement.Children.Count; i++)
+            {
+                var o = e.NewElement.Children[i];
+                var v = (SegmentedControlButton) layoutInflater.Inflate(Resource.Layout.SegmentedControl, null);
+                v.Text = o.Text;
+                if (i == 0)
+                    v.SetBackgroundResource(Resource.Drawable.segmented_control_first_background);
+                else if (i == e.NewElement.Children.Count - 1)
+                    v.SetBackgroundResource(Resource.Drawable.segmented_control_last_background);
+                g.AddView(v);
+            }
 
-			for (var i = 0; i < e.NewElement.Children.Count; i++) {
-				var o = e.NewElement.Children [i];
-				var v = (SegmentedControlButton)layoutInflater.Inflate (Resource.Layout.SegmentedControl, null);
-				v.Text = o.Text;
-				if (i == 0)
-					v.SetBackgroundResource (Resource.Drawable.segmented_control_first_background);
-				else if (i == e.NewElement.Children.Count - 1)
-					v.SetBackgroundResource (Resource.Drawable.segmented_control_last_background);
-				g.AddView (v);
-			}
+            SetNativeControl(g);
+            SetChildChecked();
+        }
 
-			SetNativeControl (g);
-		}
-	}
+        protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            base.OnElementPropertyChanged(sender, e);
 
-	public class SegmentedControlButton : RadioButton
-	{
-		private int lineHeightSelected;
-		private int lineHeightUnselected;
+            if (e.PropertyName == nameof(SegmentedControl.SelectedValue))
+            {
+                SetChildChecked();
+            }
+        }
 
-		private Paint linePaint;
+        private void SetChildChecked()
+        {
+            for (var i = 0; i < Control.ChildCount; i++)
+            {
+                var child = Control.GetChildAt(i) as RadioButton;
+                if (child != null)
+                {
+                    child.Checked = child.Text == Element.SelectedValue;
+                }
+            }
+        }
+    }
 
-		public SegmentedControlButton (Context context) : this (context, null)
-		{
-		}
+    public class SegmentedControlButton : RadioButton
+    {
+        private int _lineHeightSelected;
+        private int _lineHeightUnselected;
 
-		public SegmentedControlButton (Context context, IAttributeSet attributes) : this (context, attributes, Resource.Attribute.segmentedControlOptionStyle)
-		{
-		}
+        private Paint _linePaint;
 
-		public SegmentedControlButton (Context context, IAttributeSet attributes, int defStyle) : base (context, attributes, defStyle)
-		{
-			Initialize (attributes, defStyle);
-		}
+        public SegmentedControlButton(Context context) : this(context, null)
+        {
+        }
 
-		private void Initialize (IAttributeSet attributes, int defStyle)
-		{
-			var a = this.Context.ObtainStyledAttributes (attributes, Resource.Styleable.SegmentedControlOption, defStyle, Resource.Style.SegmentedControlOption);
+        public SegmentedControlButton(Context context, IAttributeSet attributes)
+            : this(context, attributes, Resource.Attribute.segmentedControlOptionStyle)
+        {
+        }
 
-			var lineColor = a.GetColor (Resource.Styleable.SegmentedControlOption_lineColor, 0);
-			linePaint = new Paint ();
-			linePaint.Color = lineColor;
+        public SegmentedControlButton(Context context, IAttributeSet attributes, int defStyle)
+            : base(context, attributes, defStyle)
+        {
+            Initialize(attributes, defStyle);
+        }
 
-			lineHeightUnselected = a.GetDimensionPixelSize (Resource.Styleable.SegmentedControlOption_lineHeightUnselected, 0);
-			lineHeightSelected = a.GetDimensionPixelSize (Resource.Styleable.SegmentedControlOption_lineHeightSelected, 0);
+        private void Initialize(IAttributeSet attributes, int defStyle)
+        {
+            var a = Context.ObtainStyledAttributes(attributes, Resource.Styleable.SegmentedControlOption, defStyle,
+                Resource.Style.SegmentedControlOption);
 
-			a.Recycle ();
-		}
+            var lineColor = a.GetColor(Resource.Styleable.SegmentedControlOption_lineColor, 0);
+            _linePaint = new Paint {Color = lineColor};
 
-		protected override void OnDraw (Canvas canvas)
-		{
-			base.OnDraw (canvas);
+            _lineHeightUnselected =
+                a.GetDimensionPixelSize(Resource.Styleable.SegmentedControlOption_lineHeightUnselected, 0);
+            _lineHeightSelected = a.GetDimensionPixelSize(Resource.Styleable.SegmentedControlOption_lineHeightSelected,
+                0);
 
-			if (linePaint.Color != 0 && (lineHeightSelected > 0 || lineHeightUnselected > 0)) {
-				var lineHeight = Checked ? lineHeightSelected : lineHeightUnselected;
+            a.Recycle();
+        }
 
-				if (lineHeight > 0) {
-					var rect = new Rect (0, Height - lineHeight, Width, Height);
-					canvas.DrawRect (rect, linePaint);
-				}
-			}
-		}
-	}
+        protected override void OnDraw(Canvas canvas)
+        {
+            base.OnDraw(canvas);
+
+            if (_linePaint.Color != 0 && (_lineHeightSelected > 0 || _lineHeightUnselected > 0))
+            {
+                var lineHeight = Checked ? _lineHeightSelected : _lineHeightUnselected;
+
+                if (lineHeight > 0)
+                {
+                    var rect = new Rect(0, Height - lineHeight, Width, Height);
+                    canvas.DrawRect(rect, _linePaint);
+                }
+            }
+        }
+    }
 }
