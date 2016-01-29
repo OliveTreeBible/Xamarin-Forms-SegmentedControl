@@ -1,7 +1,9 @@
 ﻿using System;
+using BiblePlus.Extensions;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
 using UIKit;
+using CoreGraphics;
 
 [assembly:ExportRenderer(typeof(SegmentedControl.SegmentedControl), typeof(SegmentedControl.iOS.SegmentedControlRenderer))]
 namespace SegmentedControl.iOS
@@ -15,25 +17,37 @@ namespace SegmentedControl.iOS
         protected override void OnElementChanged(ElementChangedEventArgs<SegmentedControl> e)
         {
             base.OnElementChanged(e);
-            if (e.NewElement == null)
-                return;
 
-            var segmentedControl = new UISegmentedControl();
-
-            for (var i = 0; i < e.NewElement.Children.Count; i++)
+            if (Control == null)
             {
-                segmentedControl.InsertSegment(e.NewElement.Children[i].Text, i, false);
+                var segmentedControl = new UISegmentedControl();
+                segmentedControl.ValueChanged += SegmentedControl_ValueChanged;
+
+                SetNativeControl(segmentedControl);
             }
 
-            if (e.NewElement.TintColor != Color.Default)
-                segmentedControl.TintColor = e.NewElement.TintColor.ToUIColor();
+            Control.RemoveAllSegments();
+            if (e.NewElement != null)
+            {
+                e.NewElement.Children.ForEach((c, i) =>
+                {
+                    Control.InsertSegment(c.Text, i, false);
+                    if (c.Text == e.NewElement.SelectedValue)
+                        Control.SelectedSegment = i;
+                });
 
-            segmentedControl.ValueChanged += (sender, eventArgs) => {
-                e.NewElement.SelectedValue = segmentedControl.TitleAt(segmentedControl.SelectedSegment);
-			};
-
-            SetNativeControl(segmentedControl);
+                if (e.NewElement.TintColor != Color.Default)
+                    Control.TintColor = e.NewElement.TintColor.ToUIColor();
+            }
         }
+
+        private void SegmentedControl_ValueChanged(object sender, EventArgs e)
+        {
+            if (Element == null) return;
+            Element.SelectedValue = Control.TitleAt(Control.SelectedSegment);
+        }
+
+        public override CGSize IntrinsicContentSize => Control.IntrinsicContentSize;
 
         protected override void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
