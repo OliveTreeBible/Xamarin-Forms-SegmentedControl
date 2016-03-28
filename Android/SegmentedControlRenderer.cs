@@ -4,10 +4,10 @@ using Android.Graphics;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
-using BiblePlus.Droid;
 using SegmentedControl.Android;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
+using Resource = BiblePlus.Droid.Resource;
 
 [assembly: ExportRenderer(typeof (SegmentedControl.SegmentedControl), typeof (SegmentedControlRenderer))]
 
