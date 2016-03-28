@@ -15,7 +15,7 @@ namespace SegmentedControl
 
         public delegate void ValueChangedEventHandler(object sender, EventArgs e);
 
-        public static readonly BindableProperty SelectedValueProperty = BindableProperty.Create<SegmentedControl, string>(s => s.SelectedValue, default(string), defaultBindingMode:BindingMode.TwoWay);
+        public static readonly BindableProperty SelectedValueProperty = BindableProperty.Create(nameof(SelectedValue), typeof(string), typeof(SegmentedControl), default(string), defaultBindingMode:BindingMode.TwoWay);
 
         public string SelectedValue
         {
@@ -23,7 +23,7 @@ namespace SegmentedControl
             set { SetValue(SelectedValueProperty, value); }
         }
 
-        public static readonly BindableProperty TintColorProperty = BindableProperty.Create<SegmentedControl, Color>(s => s.TintColor, Color.Default);
+        public static readonly BindableProperty TintColorProperty = BindableProperty.Create(nameof(TintColor), typeof(Color), typeof(SegmentedControl), Color.Default);
 
         public Color TintColor
         {
@@ -34,7 +34,7 @@ namespace SegmentedControl
 
     public class SegmentedControlOption:View
     {
-        public static readonly BindableProperty TextProperty = BindableProperty.Create<SegmentedControlOption, string>(p => p.Text, "");
+        public static readonly BindableProperty TextProperty = BindableProperty.Create(nameof(Text), typeof(string), typeof(SegmentedControl), "");
 
         public string Text {
             get{ return (string)GetValue(TextProperty); }
